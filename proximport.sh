@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $1 = "update" ]]; then
-    echo -e "To update this script, run the following command:\nwget https://raw.githubusercontent.com/FreemoX/nitc/588776bdf25719f4ec56452cb99064e4a2958834/proximport.sh && sudo chmod +x proximport.sh"
+    echo -e "To update this script, run the following command:\nwget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh && sudo chmod +x proximport.sh"
     exit 0
 
 installdeps() {

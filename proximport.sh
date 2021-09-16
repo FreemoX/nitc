@@ -24,7 +24,8 @@ getinfo() {
 
 copyfiles() {
     echo -e "\nCopying the file \"$remotefile\" from \"$remoteip\" with the user \"$remoteuser\"...\n"
-    sshpass -p "$remotepassword" scp "$remoteuser"@"$remoteip":"$remotefile" "$localfile"
+    #sshpass -p "$remotepassword" scp "$remoteuser"@"$remoteip":"$remotefile" "$localfile"
+    scp "$remoteuser"@"$remoteip":"$remotefile" "$localfile"
 }
 
 importvm() {

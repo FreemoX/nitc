@@ -5,26 +5,20 @@ if [[ $1 = "update" ]]; then
     exit 0
 fi
 
-installdeps() {
-    sudo apt install sshpass
-}
-
 getinfo() {
     echo -e "\n\nPlease supply the following information for the file copy:\n"
     read -p "Server IP to copy from: " remoteip
     read -p "Username with access to the file: " remoteuser
-    read -s -p "$remoteuser's password: " remotepassword
     read -p "FULL file path on the remote server: " remotefile
     read -p "FULL file path for the transfered file (on this system): " localfile
     read -p "Proxmox VM ID: " vmid
     read -p "Proxmox Storage Pool: " localpool
     echo ""
-    echo -e "Information you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nRemote Password: HIDDEN\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
+    echo -e "Information you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
 }
 
 copyfiles() {
     echo -e "\nCopying the file \"$remotefile\" from \"$remoteip\" with the user \"$remoteuser\"...\n"
-    #sshpass -p "$remotepassword" scp "$remoteuser"@"$remoteip":"$remotefile" "$localfile"
     scp "$remoteuser"@"$remoteip":"$remotefile" "$localfile"
 }
 
@@ -43,7 +37,6 @@ echopost() {
 }
 
 main() {
-    installdeps && echo -e "\nDependancies check completed...\n" || echo -e "\nDependancies check failed...\n"
     getinfo && echo -e "\nInformation gathered\n" || echo -e "\nInformation could not be gathered...\n"
     copyfiles && echo -e "\nFiles have been copied...\n" || echo -e "\nFiles could not be copied...\n"
     importvm && echo -e "\nVM import completed...\n" || echo -e "\nVM could not be imported...\n"

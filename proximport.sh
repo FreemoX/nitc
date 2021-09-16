@@ -19,10 +19,6 @@ getinfo() {
     read -p "Proxmox Storage Pool: " localpool
     echo ""
     echo -e "Information you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nRemote Password: HIDDEN\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-    read -p "Is the information above correct? [y|n]" confirm
-    if [[ $confirm != "y" ]] || [[ $confirm != "Y" ]]; then
-        clear && getinfo
-    fi
 }
 
 copyfiles() {

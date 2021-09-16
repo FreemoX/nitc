@@ -3,6 +3,7 @@
 if [[ $1 = "update" ]]; then
     echo -e "To update this script, run the following command:\nwget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh && sudo chmod +x proximport.sh"
     exit 0
+fi
 
 installdeps() {
     sudo apt install sshpass

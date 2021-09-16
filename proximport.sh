@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ $1 = "update" ]]; then
+    echo -e "To update this script, run the following command:\nwget https://raw.githubusercontent.com/FreemoX/nitc/588776bdf25719f4ec56452cb99064e4a2958834/proximport.sh && sudo chmod +x proximport.sh"
+    exit 0
+
 installdeps() {
     sudo apt install sshpass
 }
@@ -41,10 +45,10 @@ echopost() {
 }
 
 main() {
-    installdeps && echo -e "\nDependancies check completed...\n" || echo -e "\nDependancies check failed...\n" && exit 1
-    getinfo && echo -e "\nInformation gathered\n" || echo -e "\nInformation could not be gathered...\n" && exit 1
-    copyfiles && echo -e "\nFiles have been copied...\n" || echo -e "\nFiles could not be copied...\n" && exit 1
-    importvm && echo -e "\nVM import completed...\n" || echo -e "\nVM could not be imported...\n" && exit 1
+    installdeps && echo -e "\nDependancies check completed...\n" || echo -e "\nDependancies check failed...\n"
+    getinfo && echo -e "\nInformation gathered\n" || echo -e "\nInformation could not be gathered...\n"
+    copyfiles && echo -e "\nFiles have been copied...\n" || echo -e "\nFiles could not be copied...\n"
+    importvm && echo -e "\nVM import completed...\n" || echo -e "\nVM could not be imported...\n"
     echopost
 }
 

@@ -1,5 +1,22 @@
 #!/bin/bash
-version=1.2.2
+version=1.2.3.0
+
+# Proximport
+# A simple bash script that handles the importation of VM disks into a Proxmox VM
+#
+# Versioning explained:
+#     1st number is major release, providing new functionality to core features
+#     2nd number is medium release, greatly improving on existing core features
+#     3rd number is minor release, containing bug-fixes and similar improvements
+#     4th number is micro release, containing improvements not strictly needing an upgrade
+#
+# Current limitation:
+#     - The --copy function only uses standard scp port
+#     - There are currently minimal checks; if something goes wrong, Proximport will still continue doing its thing
+#     - There is no way to pass a remote password through Proximport; this has to be provided interactively
+# 
+# Proximport was made by Franz Rolfsvaag 2021
+# This software is released freely as-is; no guarantees or support is provided, use at your own discression!
 
 if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
     wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
@@ -33,12 +50,13 @@ elif [[ $1 = "--version" ]] || [[ $1 = "-v" ]]; then
     echo -e "\nCurrent Proximport version: $version\n"
     exit 0
 else
-    echo -e "\nPlease supply an argument\n"
-    echo "-u  | --update       Update Proximport"
-    echo "-v  | --version      Proximport installed version"
-    echo "-c  | --copy         Copy VM disk from remote server"
-    echo "-i  | --import       Import VM disk into a Proxmox VM"
-    echo "-ci | --copy-import  Copy and import a VM disk from remote server"
+    echo -e "\nPlease supply a valid argument from the list below\n"
+    echo "-u  | --update         Update Proximport"
+    echo "-uf | --update-forced  Force an update/downgrade from the latest GitHub release"
+    echo "-v  | --version        Proximport installed version"
+    echo "-c  | --copy           Copy VM disk from remote server"
+    echo "-i  | --import         Import VM disk into a Proxmox VM"
+    echo "-ci | --copy-import    Copy and import a VM disk from remote server"
     exit 0
 fi
 

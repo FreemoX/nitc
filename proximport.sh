@@ -2,21 +2,21 @@
 version=1.2.0
 
 if [[ $1 = "--update" ]]; then
-    wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -o proximport.sh.new && wait
-    versionNEW=$(head -2 proximport.sh.new | tail -1)
-    versionNEWL=$(head -2 proximport.sh.new | tail -1 | cut -d \= -f 2 | cut -d \. -f 1)
-    versionNEWM=$(head -2 proximport.sh.new | tail -1 | cut -d \= -f 2 | cut -d \. -f 2)
-    versionNEWS=$(head -2 proximport.sh.new | tail -1 | cut -d \= -f 2 | cut -d \. -f 3)
-    versionL=$(head -2 proximport.sh | tail -1 | cut -d \= -f 2 | cut -d \. -f 1)
-    versionM=$(head -2 proximport.sh | tail -1 | cut -d \= -f 2 | cut -d \. -f 2)
-    versionS=$(head -2 proximport.sh | tail -1 | cut -d \= -f 2 | cut -d \. -f 3)
+    wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
+    versionNEW=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2)
+    versionNEWL=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
+    versionNEWM=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 2)
+    versionNEWS=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
+    versionL=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
+    versionM=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 2)
+    versionS=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]]; then
         echo -e "\nThere is a new version available!\nCurrent version: $version\nNew version:     $versionNEW"
-        chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo "Update completed" || echo "Update failed"
+        chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "\nUpdate completed\n" || echo -e "\nUpdate failed\n"
     elif [[ "$versionNEW" = "$version" ]]; then
         echo -e "\nUpdate not needed, already at the latest version!"
     else
-        echo -e "\nFailed to compare versions! Is the server online?"
+        echo -e "\nEn error occured while comparing the versions!\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..."
         exit 1
     fi
     exit 0

@@ -1,4 +1,5 @@
 #!/bin/bash
+version=1.2.0
 
 if [[ $1 = "--update" ]]; then
     echo -e "To update this script, run the following command:\nwget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh && sudo chmod +x proximport.sh"

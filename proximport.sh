@@ -1,7 +1,7 @@
 #!/bin/bash
-version=1.2.0
+version=1.2.1
 
-if [[ $1 = "--update" ]]; then
+if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
     wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
     versionNEW=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2)
     versionNEWL=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
@@ -15,25 +15,26 @@ if [[ $1 = "--update" ]]; then
         chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "\nUpdate completed\n" || echo -e "\nUpdate failed\n"
     elif [[ $versionNEWL -eq $versionL ]] && [[ $versionNEWM -eq $versionM ]] && [[ $versionNEWS -eq $versionS ]]; then
         echo -e "\nUpdate not needed, already at the latest version!"
+        rm proximport.sh.new
     else
         echo -e "\nEn error occured while comparing the versions!\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..."
         exit 1
     fi
     exit 0
-elif [[ $1 = "--copy" ]]; then
+elif [[ $1 = "--copy" ]] || [[ $1 = "-c" ]]; then
     mode=0
-elif [[ $1 = "--import" ]]; then
+elif [[ $1 = "--import" ]] || [[ $1 = "-i" ]]; then
     mode=1
-elif [[ $1 = "--copy-import" ]]; then
-    echo -e "\nNOTE: using --copy-import might take too long and cause issues\nIt's recommended to do one run with --copy before doing another run with --import"
+elif [[ $1 = "--copy-import" ]] || [[ $1 = "-ci" ]]; then
+    echo -e "\nNOTE: using --copy-import might take too long and cause issues\nIt's recommended to do one run with --copy before doing another run with --import\n\nRunning \"--copy-import\" is only adviced on VM disks < 10GB\n"
     sleep 5
     mode=2
 else
-    echo -e "\nPlease supply an argument"
-    echo "--update       Update Proximport"
-    echo "--copy         Copy VM disk from remote server"
-    echo "--import       Import VM disk into a Proxmox VM"
-    echo "--copy-import  Copy and import a VM disk from remote server"
+    echo -e "\nPlease supply an argument\n"
+    echo "-u  | --update       Update Proximport"
+    echo "-c  | --copy         Copy VM disk from remote server"
+    echo "-i  | --import       Import VM disk into a Proxmox VM"
+    echo "-ci | --copy-import  Copy and import a VM disk from remote server"
     exit 0
 fi
 

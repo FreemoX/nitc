@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.1
+version=1.2.2
 
 if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
     wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
@@ -14,7 +14,7 @@ if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
         echo -e "\nThere is a new version available!\nCurrent version: $version\nNew version:     $versionNEW"
         chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "\nUpdate completed\n" || echo -e "\nUpdate failed\n"
     elif [[ $versionNEWL -eq $versionL ]] && [[ $versionNEWM -eq $versionM ]] && [[ $versionNEWS -eq $versionS ]]; then
-        echo -e "\nUpdate not needed, already at the latest version!"
+        echo -e "\nUpdate not needed, already at the latest version!\nCurrent version: $version"
         rm proximport.sh.new
     else
         echo -e "\nEn error occured while comparing the versions!\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..."
@@ -29,9 +29,13 @@ elif [[ $1 = "--copy-import" ]] || [[ $1 = "-ci" ]]; then
     echo -e "\nNOTE: using --copy-import might take too long and cause issues\nIt's recommended to do one run with --copy before doing another run with --import\n\nRunning \"--copy-import\" is only adviced on VM disks < 10GB\n"
     sleep 5
     mode=2
+elif [[ $1 = "--version" ]] || [[ $1 = "-v" ]]; then
+    echo -e "\nCurrent Proximport version: $version\n"
+    exit 0
 else
     echo -e "\nPlease supply an argument\n"
     echo "-u  | --update       Update Proximport"
+    echo "-v  | --version      Proximport installed version"
     echo "-c  | --copy         Copy VM disk from remote server"
     echo "-i  | --import       Import VM disk into a Proxmox VM"
     echo "-ci | --copy-import  Copy and import a VM disk from remote server"

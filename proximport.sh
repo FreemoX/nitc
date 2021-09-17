@@ -13,7 +13,7 @@ if [[ $1 = "--update" ]]; then
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]]; then
         echo -e "\nThere is a new version available!\nCurrent version: $version\nNew version:     $versionNEW"
         chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "\nUpdate completed\n" || echo -e "\nUpdate failed\n"
-    elif [[ "$versionNEW" = "$version" ]]; then
+    elif [[ $versionNEWL -eq $versionL ]] && [[ $versionNEWM -eq $versionM ]] && [[ $versionNEWS -eq $versionS ]]; then
         echo -e "\nUpdate not needed, already at the latest version!"
     else
         echo -e "\nEn error occured while comparing the versions!\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..."

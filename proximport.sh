@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.5.1
+version=1.2.5.2
 
 # Proximport
 # A simple bash script that handles the importation of VM disks into a Proxmox VM
@@ -187,6 +187,7 @@ echopost() {
             echo -e "\n"
         else
             echo -e "$COLERROR\n\nUNKNOWN ERROR: An unknown error occured!$COLreset\n\n"
+        fi
     fi
     echo -e "\n\n"
     read -n 1 -s -p "Press any key to exit this program" confirm;echo -e "\n\n" && exit 0

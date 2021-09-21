@@ -2,7 +2,7 @@
 Bash script handling the importation of KVM QEMU VMs into Proxmox.<br>**NOTE**: Proximport needs to be run as sudo<br><br>
 **Usage:**<ul>
   <li>-u --update<br>
-    Update proximport. Redundant above version 1.2.4 since an auto-update check is implemented
+    Force update proximport
   <li>-c --copy<br>
     Copy/transfer VM disk image from external server to the current server
   <li>-i --import<br>

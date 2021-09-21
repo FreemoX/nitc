@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.8.1
+version=1.2.8.2
 
 updateurl="https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh"
 githubhistory="https://github.com/FreemoX/nitc/commits/main/proximport.sh"
@@ -84,9 +84,12 @@ runupdate() {
     versionS=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
     versionO=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]] || [[ $versionNEWO -gt $versionO ]]; then
-        grabhistory
         echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
-        echo -e "\n\n"
+        if [[ $versionNEWO -gt $versionO ]]; then
+            echo -e "This is only an optional update containing minor improvements not related to $scriptprettyname's functionality\n"
+        fi
+        grabhistory
+        echo ""
         read -p "Do you want to update $scriptprettyname to $version? [Y|n] " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
             chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"

@@ -10,4 +10,4 @@ Bash script handling the importation of KVM QEMU VMs into Proxmox.<br>**NOTE**: 
   <li>-ci --copy-import<br>
     Runs both -c and -i in sequence. Note that this might take too long and get timed out. Use at your own risk
   <li>-v --version<br>
-    Display the installed version of Proximport
+    Display the installed version of Proximport along with a recent versions history

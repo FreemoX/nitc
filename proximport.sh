@@ -1,11 +1,14 @@
 #!/bin/bash
-version=1.2.7.1
+version=1.2.8.0
 
 updateurl="https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh"
 githubhistory="https://github.com/FreemoX/nitc/commits/main/proximport.sh"
 scriptprettyname="Proximport"
 scriptname="proximport.sh"
 scriptupdatename="proximport.sh.new"
+scripthistoryfile="proximport-update-history"
+
+arg1="$1"
 
 # Proximport
 # A simple bash script that handles the importation of VM disks into a Proxmox VM
@@ -40,33 +43,34 @@ initiatecolors() {
     COLyellow="\e[93m"
 }
 
-if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
-    wget -q $updateurl -O $scriptupdatename && wait
-    chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
-    rm $scriptupdatename && wait
-    echo -e "A restart of $scriptprettyname is needed to apply the updates!\n$scriptprettyname will now auto-close, you can now re-run it"
-    exit 0
-elif [[ $1 = "--copy" ]] || [[ $1 = "-c" ]]; then
-    mode=0
-elif [[ $1 = "--import" ]] || [[ $1 = "-i" ]]; then
-    mode=1
-    copysuccess=1
-elif [[ $1 = "--copy-import" ]] || [[ $1 = "-ci" ]]; then
-    echo -e "$COLINFO\nNOTE: using --copy-import might take too long and cause issues$COLreset\nIt's recommended to do one run with --copy before doing another run with --import\n\nRunning \"--copy-import\" is only adviced on VM disks < 10GB\n"
-    sleep 5
-    mode=2
-elif [[ $1 = "--version" ]] || [[ $1 = "-v" ]]; then
-    echo -e "\nCurrent $scriptprettyname version: $version\n"
-    exit 0
-else
-    echo -e "\nPlease supply a valid argument from the list below\n"
-    echo "-u  | --update         Force update $scriptprettyname"
-    echo "-v  | --version        $scriptprettyname installed version"
-    echo "-c  | --copy           Copy VM disk from remote server"
-    echo "-i  | --import         Import VM disk into a Proxmox VM"
-    echo "-ci | --copy-import    Copy and import a VM disk from remote server"
-    exit 0
-fi
+grabargs() {
+    if [[ $arg1 = "--update" ]] || [[ $arg1 = "-u" ]]; then
+        wget -q $updateurl -O $scriptupdatename && wait
+        chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
+        rm $scriptupdatename && wait
+        echo -e "A restart of $scriptprettyname is needed to apply the updates!\n$scriptprettyname will now auto-close, you can now re-run it"
+        exit 0
+    elif [[ $arg1 = "--copy" ]] || [[ $arg1 = "-c" ]]; then
+        mode=0
+    elif [[ $arg1 = "--import" ]] || [[ $arg1 = "-i" ]]; then
+        mode=1
+        copysuccess=1
+    elif [[ $arg1 = "--copy-import" ]] || [[ $arg1 = "-ci" ]]; then
+        echo -e "$COLINFO\nNOTE: using --copy-import might take too long and cause issues$COLreset\nIt's recommended to do one run with --copy before doing another run with --import\n\nRunning \"--copy-import\" is only adviced on VM disks < 10GB\n"
+        sleep 5
+        mode=2
+    elif [[ $arg1 = "--version" ]] || [[ $arg1 = "-v" ]]; then
+        returnversion
+    else
+        echo -e "\nPlease supply a valid argument from the list below\n"
+        echo "-u  | --update         Force update $scriptprettyname"
+        echo "-v  | --version        $scriptprettyname installed version and version history"
+        echo "-c  | --copy           Copy VM disk from remote server"
+        echo "-i  | --import         Import VM disk into a Proxmox VM"
+        echo "-ci | --copy-import    Copy and import a VM disk from remote server"
+        exit 0
+    fi
+}
 
 runupdate() {
     wget -q $updateurl -O $scriptupdatename && wait
@@ -80,6 +84,7 @@ runupdate() {
     versionS=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
     versionO=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]] || [[ $versionNEWO -gt $versionO ]]; then
+        grabhistory
         echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
         echo -e "\n\n"
         confirm="Y" && read -p "Do you want to update $scriptprettyname to $version? [Y|n] " confirm
@@ -93,11 +98,27 @@ runupdate() {
             echo "Input was not y|Y, not updating ..."
         fi
     elif [[ $versionNEWL -eq $versionL ]] && [[ $versionNEWM -eq $versionM ]] && [[ $versionNEWS -eq $versionS ]]; then
-        echo -e "\nUpdate not needed, already at the latest version!\nCurrent version: $version"
+        echo -e "You are running the newest version!\nCurrent version: $version\n"
     else
         echo -e "$COLERROR\nAn error occured while comparing the versions!$COLreset\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..." && sleep 1
     fi
     rm $scriptupdatename && wait
+}
+
+returnversion() {
+    echo -e "$COLINFO\nCurrent $scriptprettyname version: $version\n$COLreset"
+    grabhistory
+    exit 0
+}
+
+grabhistory() {
+    wget -q $githubhistory -O $scripthistoryfile && wait
+    echo -e "$COLbold\nProximport versions history (last 10 revisions) :$COLreset"
+    for i in {1..10}; do
+        echo "$(cat $scripthistoryfile | grep 'relative-time' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p ) - $(cat $scripthistoryfile | grep 'Link--primary text-bold js-navigation-open markdown-title' | grep 'Proximport v' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p ): $(cat $scripthistoryfile | grep 'text-small ws-pre-wrap' | cut -d '>' -f 3 | cut -d '<' -f 1 | sed -n $i\ p )"
+    done
+    echo ""
+    rm $scripthistoryfile
 }
 
 makescreen() {
@@ -222,6 +243,7 @@ echopost() {
 }
 
 main() {
+    grabargs
     initiatecolors || echo -e "\nERROR: Could not initiate terminal colors for some reason...\nProceeding anyway\n"
     runupdate || echo -e "\nERROR: Function \"runupdate\" returned non-zero exit code!\nDo you have network access?\nProceeding without updating\n"
     # makescreen

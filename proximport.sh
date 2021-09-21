@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.6.0
+version=1.2.7.0
 
 # Proximport
 # A simple bash script that handles the importation of VM disks into a Proxmox VM
@@ -35,7 +35,11 @@ initiatecolors() {
 }
 
 if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
-    runupdate
+    wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
+    chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
+    rm proximport.sh.new && wait
+    echo -e "A restart of proximport is needed to apply the updates!\nProximport will now auto-close, you can now re-run it"
+    exit 0
 elif [[ $1 = "--copy" ]] || [[ $1 = "-c" ]]; then
     mode=0
 elif [[ $1 = "--import" ]] || [[ $1 = "-i" ]]; then
@@ -50,8 +54,7 @@ elif [[ $1 = "--version" ]] || [[ $1 = "-v" ]]; then
     exit 0
 else
     echo -e "\nPlease supply a valid argument from the list below\n"
-    echo "-u  | --update         Update Proximport"
-    echo "-uf | --update-forced  Force an update/downgrade from the latest GitHub release"
+    echo "-u  | --update         Force update Proximport"
     echo "-v  | --version        Proximport installed version"
     echo "-c  | --copy           Copy VM disk from remote server"
     echo "-i  | --import         Import VM disk into a Proxmox VM"
@@ -73,7 +76,7 @@ runupdate() {
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]] || [[ $versionNEWO -gt $versionO ]]; then
         echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
         echo -e "\n\n"
-        read -p "Do you want to update proximport to $version? [y|n]" confirm
+        confirm="Y" && read -p "Do you want to update proximport to $version? [Y|n] " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
             echo "A restart of proximport is needed to apply the updates!"
@@ -83,10 +86,10 @@ runupdate() {
         fi
     elif [[ $versionNEWL -eq $versionL ]] && [[ $versionNEWM -eq $versionM ]] && [[ $versionNEWS -eq $versionS ]]; then
         echo -e "\nUpdate not needed, already at the latest version!\nCurrent version: $version"
-        rm proximport.sh.new && wait
     else
         echo -e "$COLERROR\nAn error occured while comparing the versions!$COLreset\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..." && sleep 1
     fi
+    rm proximport.sh.new && wait
 }
 
 makescreen() {
@@ -102,7 +105,7 @@ getinfo() {
         read -p "FULL file path for the transfered file (on this system): " localfile
         if [[ -f "$localfile" ]]; then
             echo -e "$COLINFO\nThat file already exists!$COLreset\nIt needs to be removed in order to proceed!"
-            read -p "Remove $localfile ? [y|n]"
+            confirm="Y" && read -p "Remove $localfile ? [Y|n]: " confirm
             if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
                 echo "Removing $localfile ..."
                 sudo rm $localfile && wait
@@ -112,11 +115,11 @@ getinfo() {
             fi
         fi
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile"
-        read -p "Is the information above correct? [y|Y]" confirm
+        confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             echo "Ok"
         else
-            echo -e "Input was not y|Y ...\n"
+            echo -e "Input was not y|Y ...\nPlease supply your information again\n"
             getinfo
         fi
     elif [[ "$mode" = 1 ]]; then
@@ -124,11 +127,11 @@ getinfo() {
         read -p "Proxmox VM ID: " vmid
         read -p "Proxmox Storage Pool: " localpool
         echo -e "\nInformation you provided:\nVM Disk to import: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-        read -p "Is the information above correct? [y|Y]" confirm
+        confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             echo "Ok"
         else
-            echo -e "Input was not y|Y ...\n"
+            echo -e "Input was not y|Y ...\nPlease supply your information again\n"
             getinfo
         fi
     elif [[ "$mode" = 2 ]]; then
@@ -140,11 +143,11 @@ getinfo() {
         read -p "Proxmox VM ID: " vmid
         read -p "Proxmox Storage Pool: " localpool
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-        read -p "Is the information above correct? [y|Y]" confirm
+        confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             echo "Ok"
         else
-            echo -e "Input was not y|Y ...\n"
+            echo -e "Input was not y|Y ...\nPlease supply your information again\n"
             getinfo
         fi
     fi
@@ -203,11 +206,11 @@ main() {
     initiatecolors
     runupdate
     # makescreen
-    getinfo && echo -e "$COLSUCCESS\nInformation gathered$COLreset\n" || echo -e "$COLERROR\nInformation could not be gathered...$COLreset\n"
+    getinfo && wait && echo -e "$COLSUCCESS\nInformation gathered$COLreset\n" || echo -e "$COLERROR\nInformation could not be gathered...$COLreset\n"
     if [[ "$mode" = 0 ]] || [[ "$mode" = 2 ]]; then
-        copyfiles && echo -e "$COLSUCCESS\nFiles have been copied...$COLreset\n" || echo -e "$COLERROR\nFiles could not be copied...$COLreset\n"
+        copyfiles && wait && echo -e "$COLSUCCESS\nFiles have been copied...$COLreset\n" || echo -e "$COLERROR\nFiles could not be copied...$COLreset\n"
     elif [[ "$mode" = 1 ]] || [[ "$mode" = 2 ]]; then
-        importvm && echo -e "$COLSUCCESS\nVM import completed...$COLreset\n" || echo -e "$COLERROR\nVM could not be imported...$COLreset\n"
+        importvm && wait && echo -e "$COLSUCCESS\nVM import completed...$COLreset\n" || echo -e "$COLERROR\nVM could not be imported...$COLreset\n"
     fi
     echopost
 }

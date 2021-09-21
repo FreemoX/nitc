@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.8.0
+version=1.2.8.1
 
 updateurl="https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh"
 githubhistory="https://github.com/FreemoX/nitc/commits/main/proximport.sh"
@@ -87,8 +87,8 @@ runupdate() {
         grabhistory
         echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
         echo -e "\n\n"
-        confirm="Y" && read -p "Do you want to update $scriptprettyname to $version? [Y|n] " confirm
-        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+        read -p "Do you want to update $scriptprettyname to $version? [Y|n] " confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
             chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
             echo "A restart of $scriptprettyname is needed to apply the updates!"
             exit 0
@@ -134,8 +134,8 @@ getinfo() {
         read -p "FULL file path for the transfered file (on this system): " localfile
         if [[ -f "$localfile" ]]; then
             echo -e "$COLINFO\nThat file already exists!$COLreset\nIt needs to be removed in order to proceed!"
-            confirm="Y" && read -p "Remove $localfile ? [Y|n]: " confirm
-            if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+            read -p "Remove $localfile ? [Y|n]: " confirm
+            if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
                 echo "Removing $localfile ..."
                 sudo rm $localfile && wait
             elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
@@ -146,8 +146,8 @@ getinfo() {
             fi
         fi
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile"
-        confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
-        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+        read -p "Is the information above correct? [Y|n]: " confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
             echo "Ok"
         elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
             echo "Ok, we'll try that again"
@@ -161,8 +161,8 @@ getinfo() {
         read -p "Proxmox VM ID: " vmid
         read -p "Proxmox Storage Pool: " localpool
         echo -e "\nInformation you provided:\nVM Disk to import: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-        confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
-        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+        read -p "Is the information above correct? [Y|n]: " confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
             echo "Ok"
         elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
             echo "Ok, we'll try that again"
@@ -180,8 +180,8 @@ getinfo() {
         read -p "Proxmox VM ID: " vmid
         read -p "Proxmox Storage Pool: " localpool
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-        confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
-        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+        read -p "Is the information above correct? [Y|n]: " confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
             echo "Ok"
         elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
             echo "Ok, we'll try that again"

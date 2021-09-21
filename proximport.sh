@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.5.2
+version=1.2.6.0
 
 # Proximport
 # A simple bash script that handles the importation of VM disks into a Proxmox VM
@@ -90,7 +90,7 @@ runupdate() {
 }
 
 makescreen() {
-    screen -S proximport.sh && echo -e "\nYou are now using a screen named \"proximport.sh\"\nTo disconnect from the screen, press \'CTRL+A D\'\nTo reconnect to the screen, run \'screen -r proximport.sh\'\n\nDO NOT PRESS CTRL+C or abort in any way, that will exit proximport and potentially lock the system!\n\n\n" || echo -e "\nUnable to create the screen \"proximport.sh\", is screen installed?\n\n"
+    screen -S proximport.sh && wait && echo -e "\nYou are now using a screen named \"proximport.sh\"\nTo disconnect from the screen, press \'CTRL+A D\'\nTo reconnect to the screen, run \'screen -r proximport.sh\'\n\nDO NOT PRESS CTRL+C or abort in any way, that will exit proximport and potentially lock the system!\n\n\n" || echo -e "\nUnable to create the screen \"proximport.sh\", is screen installed?\n\n"
 }
 
 getinfo() {
@@ -112,8 +112,10 @@ getinfo() {
             fi
         fi
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile"
-        read -p "Is the information above correct?" confirm
-        if [[ $confirm != "y" ]] || [[ $confirm != "Y" ]]; then
+        read -p "Is the information above correct? [y|Y]" confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+            echo "Ok"
+        else
             echo -e "Input was not y|Y ...\n"
             getinfo
         fi
@@ -122,8 +124,10 @@ getinfo() {
         read -p "Proxmox VM ID: " vmid
         read -p "Proxmox Storage Pool: " localpool
         echo -e "\nInformation you provided:\nVM Disk to import: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-        read -p "Is the information above correct?" confirm
-        if [[ $confirm != "y" ]] || [[ $confirm != "Y" ]]; then
+        read -p "Is the information above correct? [y|Y]" confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+            echo "Ok"
+        else
             echo -e "Input was not y|Y ...\n"
             getinfo
         fi
@@ -136,8 +140,10 @@ getinfo() {
         read -p "Proxmox VM ID: " vmid
         read -p "Proxmox Storage Pool: " localpool
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile\nVM ID: $vmid\nProxmox storage pool: $localpool"
-        read -p "Is the information above correct?" confirm
-        if [[ $confirm != "y" ]] || [[ $confirm != "Y" ]]; then
+        read -p "Is the information above correct? [y|Y]" confirm
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
+            echo "Ok"
+        else
             echo -e "Input was not y|Y ...\n"
             getinfo
         fi
@@ -196,7 +202,7 @@ echopost() {
 main() {
     initiatecolors
     runupdate
-    makescreen
+    # makescreen
     getinfo && echo -e "$COLSUCCESS\nInformation gathered$COLreset\n" || echo -e "$COLERROR\nInformation could not be gathered...$COLreset\n"
     if [[ "$mode" = 0 ]] || [[ "$mode" = 2 ]]; then
         copyfiles && echo -e "$COLSUCCESS\nFiles have been copied...$COLreset\n" || echo -e "$COLERROR\nFiles could not be copied...$COLreset\n"

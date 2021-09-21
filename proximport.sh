@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.8.2
+version=1.2.9.0
 
 updateurl="https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh"
 githubhistory="https://github.com/FreemoX/nitc/commits/main/proximport.sh"
@@ -116,11 +116,20 @@ returnversion() {
 
 grabhistory() {
     wget -q $githubhistory -O $scripthistoryfile && wait
-    echo -e "$COLbold\nProximport versions history (last 10 revisions) :$COLreset"
-    for i in {1..10}; do
+    echo -e "$COLbold\nProximport new versions overview: $COLINFO"
+    fortimes=0
+    for i in {1..20}; do
+    scannedversion=$(cat $scripthistoryfile | grep 'Link--primary text-bold js-navigation-open markdown-title' | grep 'Proximport v' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p | cut -c 13-)
+    fortimes=$(($fortimes+1))
+        if [[ $scannedversion = $version ]]; then
+            if [[ $fortimes = 1 ]]; then
+                echo -e "No new updates available"
+            fi
+            break
+        fi
         echo "$(cat $scripthistoryfile | grep 'relative-time' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p ) - $(cat $scripthistoryfile | grep 'Link--primary text-bold js-navigation-open markdown-title' | grep 'Proximport v' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p ): $(cat $scripthistoryfile | grep 'text-small ws-pre-wrap' | cut -d '>' -f 3 | cut -d '<' -f 1 | sed -n $i\ p )"
     done
-    echo ""
+    echo "$COLreset"
     rm $scripthistoryfile
 }
 

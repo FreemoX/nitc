@@ -74,7 +74,7 @@ runupdate() {
         echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
         echo -e "\n\n"
         read -p "Do you want to update proximport to $version? [y|n]" confirm
-        if [[ $confirm = "y" ]] || [[ $confirm = "Y" ]]; then
+        if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
             echo "A restart of proximport is needed to apply the updates!"
             exit 0
@@ -103,7 +103,7 @@ getinfo() {
         if [[ -f "$localfile" ]]; then
             echo -e "$COLINFO\nThat file already exists!$COLreset\nIt needs to be removed in order to proceed!"
             read -p "Remove $localfile ? [y|n]"
-            if [[ $confirm = "y" ]] || [[ $confirm = "Y" ]]; then
+            if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
                 echo "Removing $localfile ..."
                 sudo rm $localfile && wait
             else

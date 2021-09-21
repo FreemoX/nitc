@@ -1,5 +1,11 @@
 #!/bin/bash
-version=1.2.7.0
+version=1.2.7.1
+
+updateurl="https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh"
+githubhistory="https://github.com/FreemoX/nitc/commits/main/proximport.sh"
+scriptprettyname="Proximport"
+scriptname="proximport.sh"
+scriptupdatename="proximport.sh.new"
 
 # Proximport
 # A simple bash script that handles the importation of VM disks into a Proxmox VM
@@ -35,10 +41,10 @@ initiatecolors() {
 }
 
 if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
-    wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
-    chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
-    rm proximport.sh.new && wait
-    echo -e "A restart of proximport is needed to apply the updates!\nProximport will now auto-close, you can now re-run it"
+    wget -q $updateurl -O $scriptupdatename && wait
+    chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
+    rm $scriptupdatename && wait
+    echo -e "A restart of $scriptprettyname is needed to apply the updates!\n$scriptprettyname will now auto-close, you can now re-run it"
     exit 0
 elif [[ $1 = "--copy" ]] || [[ $1 = "-c" ]]; then
     mode=0
@@ -50,12 +56,12 @@ elif [[ $1 = "--copy-import" ]] || [[ $1 = "-ci" ]]; then
     sleep 5
     mode=2
 elif [[ $1 = "--version" ]] || [[ $1 = "-v" ]]; then
-    echo -e "\nCurrent Proximport version: $version\n"
+    echo -e "\nCurrent $scriptprettyname version: $version\n"
     exit 0
 else
     echo -e "\nPlease supply a valid argument from the list below\n"
-    echo "-u  | --update         Force update Proximport"
-    echo "-v  | --version        Proximport installed version"
+    echo "-u  | --update         Force update $scriptprettyname"
+    echo "-v  | --version        $scriptprettyname installed version"
     echo "-c  | --copy           Copy VM disk from remote server"
     echo "-i  | --import         Import VM disk into a Proxmox VM"
     echo "-ci | --copy-import    Copy and import a VM disk from remote server"
@@ -63,24 +69,26 @@ else
 fi
 
 runupdate() {
-    wget https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh -O proximport.sh.new && wait
-    versionNEW=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2)
-    versionNEWL=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
-    versionNEWM=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 2)
-    versionNEWS=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
-    versionNEWO=$(head -2 proximport.sh.new | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
-    versionL=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
-    versionM=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 2)
-    versionS=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
-    versionO=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
+    wget -q $updateurl -O $scriptupdatename && wait
+    versionNEW=$(head -2 $scriptupdatename | tail -1 | cut -d '=' -f 2)
+    versionNEWL=$(head -2 $scriptupdatename | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
+    versionNEWM=$(head -2 $scriptupdatename | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 2)
+    versionNEWS=$(head -2 $scriptupdatename | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
+    versionNEWO=$(head -2 $scriptupdatename | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
+    versionL=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 1)
+    versionM=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 2)
+    versionS=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
+    versionO=$(head -2 $scriptname | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]] || [[ $versionNEWO -gt $versionO ]]; then
         echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
         echo -e "\n\n"
-        confirm="Y" && read -p "Do you want to update proximport to $version? [Y|n] " confirm
+        confirm="Y" && read -p "Do you want to update $scriptprettyname to $version? [Y|n] " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
-            chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
-            echo "A restart of proximport is needed to apply the updates!"
+            chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
+            echo "A restart of $scriptprettyname is needed to apply the updates!"
             exit 0
+        elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
+            echo "Ok, not updating $scriptprettyname"
         else
             echo "Input was not y|Y, not updating ..."
         fi
@@ -89,11 +97,11 @@ runupdate() {
     else
         echo -e "$COLERROR\nAn error occured while comparing the versions!$COLreset\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..." && sleep 1
     fi
-    rm proximport.sh.new && wait
+    rm $scriptupdatename && wait
 }
 
 makescreen() {
-    screen -S proximport.sh && wait && echo -e "\nYou are now using a screen named \"proximport.sh\"\nTo disconnect from the screen, press \'CTRL+A D\'\nTo reconnect to the screen, run \'screen -r proximport.sh\'\n\nDO NOT PRESS CTRL+C or abort in any way, that will exit proximport and potentially lock the system!\n\n\n" || echo -e "\nUnable to create the screen \"proximport.sh\", is screen installed?\n\n"
+    screen -S $scriptname && wait && echo -e "\nYou are now using a screen named \"$scriptname\"\nTo disconnect from the screen, press \'CTRL+A D\'\nTo reconnect to the screen, run \'screen -r $scriptname\'\n\nDO NOT PRESS CTRL+C or abort in any way, that will exit $scriptprettyname and potentially lock the system!\n\n\n" || echo -e "\nUnable to create the screen \"$scriptname\", is screen installed?\n\n"
 }
 
 getinfo() {
@@ -109,6 +117,8 @@ getinfo() {
             if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
                 echo "Removing $localfile ..."
                 sudo rm $localfile && wait
+            elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
+                echo "Ok, not removing the old file $localfile"
             else
                 echo "Input was not y|Y, aborting ..."
                 exit 0
@@ -118,6 +128,9 @@ getinfo() {
         confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             echo "Ok"
+        elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
+            echo "Ok, we'll try that again"
+            getinfo
         else
             echo -e "Input was not y|Y ...\nPlease supply your information again\n"
             getinfo
@@ -130,6 +143,9 @@ getinfo() {
         confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             echo "Ok"
+        elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
+            echo "Ok, we'll try that again"
+            getinfo
         else
             echo -e "Input was not y|Y ...\nPlease supply your information again\n"
             getinfo
@@ -146,6 +162,9 @@ getinfo() {
         confirm="Y" && read -p "Is the information above correct? [Y|n]: " confirm
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]]; then
             echo "Ok"
+        elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
+            echo "Ok, we'll try that again"
+            getinfo
         else
             echo -e "Input was not y|Y ...\nPlease supply your information again\n"
             getinfo
@@ -169,7 +188,7 @@ echopost() {
         if [[ $copysuccess -ne 1 ]]; then
             echo -e "$COLERROR\n\nTRANSFER ERROR: The VM disk file could not be copied from the remote server!$COLreset\n\n"
         elif [[ $copysuccess -eq 1 ]]; then
-            echo -e "The VM Disk should now be copied from the remote server, and stored on this server under:\n$localfile\n\nRemember to re-run Proximport with the \"--import\" argument to start the import"
+            echo -e "The VM Disk should now be copied from the remote server, and stored on this server under:\n$localfile\n\nRemember to re-run $scriptprettyname with the \"--import\" argument to start the import"
         else
             echo -e "$COLERROR\n\nUNKNOWN ERROR: An unknown error occured!$COLreset\n\n"
         fi
@@ -199,12 +218,12 @@ echopost() {
         fi
     fi
     echo -e "\n\n"
-    read -n 1 -s -p "Press any key to exit this program" confirm;echo -e "\n\n" && exit 0
+    read -n 1 -s -p "Press any key to exit $scriptprettyname" confirm;echo -e "\n\n" && exit 0
 }
 
 main() {
-    initiatecolors
-    runupdate
+    initiatecolors || echo -e "\nERROR: Could not initiate terminal colors for some reason...\nProceeding anyway\n"
+    runupdate || echo -e "\nERROR: Function \"runupdate\" returned non-zero exit code!\nDo you have network access?\nProceeding without updating\n"
     # makescreen
     getinfo && wait && echo -e "$COLSUCCESS\nInformation gathered$COLreset\n" || echo -e "$COLERROR\nInformation could not be gathered...$COLreset\n"
     if [[ "$mode" = 0 ]] || [[ "$mode" = 2 ]]; then
@@ -215,4 +234,4 @@ main() {
     echopost
 }
 
-main
+main || echo -e "CRITICAL ERROR: Uhm... So this is awkward. The function \"main\" failed executing...\nTry installing a different version, you can find them at: $githubhistory\nRemember to make $scriptprettyname executable after downloading it\n\n"

@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.5.0
+version=1.2.5.1
 
 # Proximport
 # A simple bash script that handles the importation of VM disks into a Proxmox VM
@@ -18,6 +18,22 @@ version=1.2.5.0
 # Proximport was made by Franz Rolfsvaag 2021
 # This software is released freely as-is; no guarantees or support is provided, use at your own discression!
 
+initiatecolors() {
+    COLreset="\e[0m"
+    COLbold="\e[1m"
+    COLunderline="\e[4m"
+    COLblink="\e[5m"
+
+    COLERROR="\e[1m \e[5m \e[31m"
+    COLSUCCESS="\e[1m \e[32m"
+    COLINFO="\e[1m \e[93m"
+    COLFILE="\e[4m"
+
+    COLred="\e[31m"
+    COLgreen="\e[32m"
+    COLyellow="\e[93m"
+}
+
 if [[ $1 = "--update" ]] || [[ $1 = "-u" ]]; then
     runupdate
 elif [[ $1 = "--copy" ]] || [[ $1 = "-c" ]]; then
@@ -26,7 +42,7 @@ elif [[ $1 = "--import" ]] || [[ $1 = "-i" ]]; then
     mode=1
     copysuccess=1
 elif [[ $1 = "--copy-import" ]] || [[ $1 = "-ci" ]]; then
-    echo -e "\nNOTE: using --copy-import might take too long and cause issues\nIt's recommended to do one run with --copy before doing another run with --import\n\nRunning \"--copy-import\" is only adviced on VM disks < 10GB\n"
+    echo -e "$COLINFO\nNOTE: using --copy-import might take too long and cause issues$COLreset\nIt's recommended to do one run with --copy before doing another run with --import\n\nRunning \"--copy-import\" is only adviced on VM disks < 10GB\n"
     sleep 5
     mode=2
 elif [[ $1 = "--version" ]] || [[ $1 = "-v" ]]; then
@@ -55,11 +71,11 @@ runupdate() {
     versionS=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 3)
     versionO=$(head -2 proximport.sh | tail -1 | cut -d '=' -f 2 | cut -d '.' -f 4)
     if [[ $versionNEWL -gt $versionL ]] || [[ $versionNEWM -gt $versionM ]] || [[ $versionNEWS -gt $versionS ]] || [[ $versionNEWO -gt $versionO ]]; then
-        echo -e "\nThere is a new version available!\nCurrent version: $version\nNew version:     $versionNEW"
+        echo -e "$COLINFO\nThere is a new version available!$COLreset\nCurrent version: $version\nNew version:     $versionNEW"
         echo -e "\n\n"
         read -p "Do you want to update proximport to $version? [y|n]" confirm
         if [[ $confirm = "y" ]] || [[ $confirm = "Y" ]]; then
-            chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "\nUpdate completed\n" || echo -e "\nUpdate failed\n"
+            chmod +x proximport.sh.new && mv proximport.sh.new proximport.sh && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
             echo "A restart of proximport is needed to apply the updates!"
             exit 0
         else
@@ -69,7 +85,7 @@ runupdate() {
         echo -e "\nUpdate not needed, already at the latest version!\nCurrent version: $version"
         rm proximport.sh.new && wait
     else
-        echo -e "\nAn error occured while comparing the versions!\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..." && sleep 1
+        echo -e "$COLERROR\nAn error occured while comparing the versions!$COLreset\nThis is usually caused by the server not being able to reach GitHub\nThis can also be caused by running a version newer than the release on GitHub. You wizard..." && sleep 1
     fi
 }
 
@@ -85,7 +101,7 @@ getinfo() {
         read -p "FULL file path on the remote server: " remotefile
         read -p "FULL file path for the transfered file (on this system): " localfile
         if [[ -f "$localfile" ]]; then
-            echo -e "That file already exists!\nIt needs to be removed in order to proceed!"
+            echo -e "$COLINFO\nThat file already exists!$COLreset\nIt needs to be removed in order to proceed!"
             read -p "Remove $localfile ? [y|n]"
             if [[ $confirm = "y" ]] || [[ $confirm = "Y" ]]; then
                 echo "Removing $localfile ..."
@@ -142,15 +158,15 @@ importvm() {
 echopost() {
     if [[ "$mode" = 0 ]]; then
         if [[ $copysuccess -ne 1 ]]; then
-            echo -e "\n\nTRANSFER ERROR: The VM disk file could not be copied from the remote server!\n\n"
+            echo -e "$COLERROR\n\nTRANSFER ERROR: The VM disk file could not be copied from the remote server!$COLreset\n\n"
         elif [[ $copysuccess -eq 1 ]]; then
             echo -e "The VM Disk should now be copied from the remote server, and stored on this server under:\n$localfile\n\nRemember to re-run Proximport with the \"--import\" argument to start the import"
         else
-            echo -e "\n\nUNKNOWN ERROR: An unknown error occured!\n\n"
+            echo -e "$COLERROR\n\nUNKNOWN ERROR: An unknown error occured!$COLreset\n\n"
         fi
     elif [[ "$mode" = 1 ]] || [[ "$mode" = 2 ]]; then
         if [[ $copysuccess -ne 1 ]] || [[ $importdisksuccess -ne 1 ]] || [[ $rescansuccess -ne 1 ]] || [[ $setvmmaindisk -ne 1 ]]; then
-            echo -e "\n\nERROR: An error occured during the operation....\nThe following tasks returned a failed flag:\n"
+            echo -e "$COLERROR\n\nERROR: An error occured during the operation....$COLreset\nThe following tasks returned a failed flag:\n"
             if [[ $copysuccess -ne 1 ]]; then
                 echo "- File transfer from remote server"
             fi
@@ -165,25 +181,26 @@ echopost() {
             fi
             echo -e "NOTE: The top failed task indicates which task in the chain failed"
         elif [[ $copysuccess -eq 1 ]] && [[ $importdisksuccess -eq 1 ]] && [[ $rescansuccess -eq 1 ]] && [[ $setvmmaindisk -eq 1 ]]; then
-            echo -e "\n\nThe VM should now be imported into Proxmox.\nPlease note that some reconfiguration need to be done within the Proxmox WebGUI, such as:"
+            echo -e "$CULSUCCESS\n\nThe VM should now be imported into Proxmox.$COLreset\nPlease note that some reconfiguration need to be done within the Proxmox WebGUI, such as:"
             echo -e "- Reconfigure the network interfaces\n    Imported VMs don't usually have network connection out-of-the-box\n    Editing \"/etc/netplan/01-netcfg.yaml\" to include the line \"renderer: networkd\" below the \"version\" line should enable the imported VM to grab DHCP\n    The original VM should be disabled to avoid MAC address conflicts and similar issues"
             echo -e "- Reconfigure the VM Boot Order so it attempts to boot from Disk 0 first\n    This is not strictly needed, but should avoid some issues and increase boot speed"
             echo -e "\n"
         else
-            echo -e "\n\nUNKNOWN ERROR: An unknown error occured!\n\n"
+            echo -e "$COLERROR\n\nUNKNOWN ERROR: An unknown error occured!$COLreset\n\n"
     fi
     echo -e "\n\n"
     read -n 1 -s -p "Press any key to exit this program" confirm;echo -e "\n\n" && exit 0
 }
 
 main() {
+    initiatecolors
     runupdate
     makescreen
-    getinfo && echo -e "\nInformation gathered\n" || echo -e "\nInformation could not be gathered...\n"
+    getinfo && echo -e "$COLSUCCESS\nInformation gathered$COLreset\n" || echo -e "$COLERROR\nInformation could not be gathered...$COLreset\n"
     if [[ "$mode" = 0 ]] || [[ "$mode" = 2 ]]; then
-        copyfiles && echo -e "\nFiles have been copied...\n" || echo -e "\nFiles could not be copied...\n"
+        copyfiles && echo -e "$COLSUCCESS\nFiles have been copied...$COLreset\n" || echo -e "$COLERROR\nFiles could not be copied...$COLreset\n"
     elif [[ "$mode" = 1 ]] || [[ "$mode" = 2 ]]; then
-        importvm && echo -e "\nVM import completed...\n" || echo -e "\nVM could not be imported...\n"
+        importvm && echo -e "$COLSUCCESS\nVM import completed...$COLreset\n" || echo -e "$COLERROR\nVM could not be imported...$COLreset\n"
     fi
     echopost
 }

@@ -1,5 +1,5 @@
 #!/bin/bash
-version=1.2.9.0
+version=1.2.9.1
 
 updateurl="https://raw.githubusercontent.com/FreemoX/nitc/main/proximport.sh"
 githubhistory="https://github.com/FreemoX/nitc/commits/main/proximport.sh"
@@ -49,7 +49,7 @@ grabargs() {
         chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
         rm $scriptupdatename && wait
         echo -e "A restart of $scriptprettyname is needed to apply the updates!\n$scriptprettyname will now auto-close, you can now re-run it"
-        exit 0
+        close 0
     elif [[ $arg1 = "--copy" ]] || [[ $arg1 = "-c" ]]; then
         mode=0
     elif [[ $arg1 = "--import" ]] || [[ $arg1 = "-i" ]]; then
@@ -68,7 +68,7 @@ grabargs() {
         echo "-c  | --copy           Copy VM disk from remote server"
         echo "-i  | --import         Import VM disk into a Proxmox VM"
         echo "-ci | --copy-import    Copy and import a VM disk from remote server"
-        exit 0
+        close 0
     fi
 }
 
@@ -94,7 +94,7 @@ runupdate() {
         if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
             chmod +x $scriptupdatename && mv $scriptupdatename $scriptname && echo -e "$COLgreen\nUpdate completed$COLreset\n" || echo -e "$COLERROR\nUpdate failed$COLreset\n"
             echo "A restart of $scriptprettyname is needed to apply the updates!"
-            exit 0
+            close 0
         elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
             echo "Ok, not updating $scriptprettyname"
         else
@@ -109,14 +109,14 @@ runupdate() {
 }
 
 returnversion() {
-    echo -e "$COLINFO\nCurrent $scriptprettyname version: $version\n$COLreset"
+    echo -e "$COLINFO\nCurrent $scriptprettyname version: $version\n $COLreset"
     grabhistory
-    exit 0
+    close 0
 }
 
 grabhistory() {
     wget -q $githubhistory -O $scripthistoryfile && wait
-    echo -e "$COLbold\nProximport new versions overview: $COLINFO"
+    echo -e "$COLbold\nProximport new versions: $COLINFO"
     fortimes=0
     for i in {1..20}; do
     scannedversion=$(cat $scripthistoryfile | grep 'Link--primary text-bold js-navigation-open markdown-title' | grep 'Proximport v' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p | cut -c 13-)
@@ -129,7 +129,7 @@ grabhistory() {
         fi
         echo "$(cat $scripthistoryfile | grep 'relative-time' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p ) - $(cat $scripthistoryfile | grep 'Link--primary text-bold js-navigation-open markdown-title' | grep 'Proximport v' | cut -d '>' -f 2 | cut -d '<' -f 1 | sed -n $i\ p ): $(cat $scripthistoryfile | grep 'text-small ws-pre-wrap' | cut -d '>' -f 3 | cut -d '<' -f 1 | sed -n $i\ p )"
     done
-    echo "$COLreset"
+    echo " $COLreset "
     rm $scripthistoryfile
 }
 
@@ -154,7 +154,7 @@ getinfo() {
                 echo "Ok, not removing the old file $localfile"
             else
                 echo "Input was not y|Y, aborting ..."
-                exit 0
+                close 0
             fi
         fi
         echo -e "\nInformation you provided:\nServer IP: $remoteip\nRemote User: $remoteuser\nFile to copy FROM: $remotefile\nFile to copy TO: $localfile"
@@ -251,7 +251,30 @@ echopost() {
         fi
     fi
     echo -e "\n\n"
-    read -n 1 -s -p "Press any key to exit $scriptprettyname" confirm;echo -e "\n\n" && exit 0
+    read -n 1 -s -p "Press any key to exit $scriptprettyname" confirm;echo -e "\n\n" && close 0
+}
+
+close() {
+    echo "$COLreset"
+    if test -f "$localfile"; then
+        while :
+        do
+            read -p "Do you wish to delete $localfile? [Y|n]: " confirm
+            if [[ "$confirm" = "y" ]] || [[ "$confirm" = "Y" ]] || [[ "$confirm" = "" ]]; then
+                rm $localfile && echo "$localfile has been deleted" || echo "Unable to delete $localfile..."
+                break
+            elif [[ "$confirm" = "n" ]] || [[ "$confirm" = "N" ]]; then
+                echo "Ok, not deleting $localfile"
+                break
+            else
+                echo -e "Input was not recognized, try again\n"
+            fi
+        done
+    fi
+    if test -f "$scriptupdatename"; then
+        rm $scriptupdatename
+    fi
+    exit $1
 }
 
 main() {
